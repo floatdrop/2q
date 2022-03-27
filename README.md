@@ -35,8 +35,8 @@ See [LRU TTL example](https://github.com/floatdrop/lru#ttl).
 
 ```
 floatdrop/twoqueue:
-	Benchmark2Q_Rand-8   	 4375202	       272.2 ns/op	      21 B/op	       1 allocs/op
-	Benchmark2Q_Freq-8   	 4882906	       250.9 ns/op	      20 B/op	       1 allocs/op
+	Benchmark2Q_Rand-8   	 4296108	       274.9 ns/op	      33 B/op	       2 allocs/op
+	Benchmark2Q_Freq-8   	 4674632	       253.8 ns/op	      31 B/op	       2 allocs/op
 
 hashicorp/golang-lru:
 	Benchmark2Q_Rand-8    	 2847627	       411.9 ns/op	     135 B/op	       5 allocs/op
