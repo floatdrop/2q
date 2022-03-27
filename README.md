@@ -1,7 +1,7 @@
 # 2q
 [![Go Reference](https://pkg.go.dev/badge/github.com/floatdrop/2q.svg)](https://pkg.go.dev/github.com/floatdrop/2q)
 [![CI](https://github.com/floatdrop/2q/actions/workflows/ci.yml/badge.svg)](https://github.com/floatdrop/2q/actions/workflows/ci.yml)
-![Coverage](https://img.shields.io/badge/Coverage-100.0%25-brightgreen)
+![Coverage](https://img.shields.io/badge/Coverage-70.6%25-yellow)
 [![Go Report Card](https://goreportcard.com/badge/github.com/floatdrop/2q)](https://goreportcard.com/report/github.com/floatdrop/2q)
 
 Thread safe GoLang [2Q](http://www.vldb.org/conf/1994/P439.PDF) cache.
