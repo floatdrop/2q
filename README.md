@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	cache := twoqueue.New[string, int](64, 128, 192)
+	cache := twoqueue.New[string, int](256)
 
 	cache.Set("Hello", 5)
 

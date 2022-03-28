@@ -6,7 +6,7 @@ import (
 )
 
 func Benchmark2Q_Rand(b *testing.B) {
-	l := New[int64, int64](2048, 4096, 6144)
+	l := New[int64, int64](8196)
 
 	trace := make([]int64, b.N*2)
 	for i := 0; i < b.N*2; i++ {
@@ -31,7 +31,7 @@ func Benchmark2Q_Rand(b *testing.B) {
 }
 
 func Benchmark2Q_Freq(b *testing.B) {
-	l := New[int64, int64](2048, 4096, 6144)
+	l := New[int64, int64](8196)
 
 	trace := make([]int64, b.N*2)
 	for i := 0; i < b.N*2; i++ {
@@ -59,7 +59,7 @@ func Benchmark2Q_Freq(b *testing.B) {
 }
 
 func Test2Q(t *testing.T) {
-	l := New[int, int](32, 64, 96)
+	l := New[int, int](128)
 
 	for i := 0; i < 256; i++ {
 		l.Set(i, i)
