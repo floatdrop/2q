@@ -92,7 +92,7 @@ func (L *TwoQueue[K, V]) Len() int {
 
 // Peek returns value for key (if key was in cache), but does not modify its recency.
 func (L *TwoQueue[K, V]) Peek(key K) *V {
-	if e := L.frequent.Get(key); e != nil {
+	if e := L.frequent.Peek(key); e != nil {
 		return e
 	}
 
