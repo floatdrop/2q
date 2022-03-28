@@ -1,6 +1,7 @@
 package twoqueue
 
 import (
+	"github.com/floatdrop/fifo"
 	"github.com/floatdrop/lru"
 )
 
@@ -23,18 +24,29 @@ const (
 // computationally about 2x the cost, and adds some metadata over
 // head.
 type TwoQueue[K comparable, V any] struct {
-	recent      *lru.LRU[K, V]        // A1in in paper (should have type FIFO[entry[K, V]])
-	recentEvict *lru.LRU[K, struct{}] // A1out in paper (should be FIFO[k])
-	frequent    *lru.LRU[K, V]        // Am in paper
+	recent      *fifo.FIFO[K, V]        // A1in in paper
+	recentEvict *fifo.FIFO[K, struct{}] // A1out in paper
+	frequent    *lru.LRU[K, V]          // Am in paper
 }
 
 // Evicted holds key/value pair that was evicted from cache.
 type Evicted[K comparable, V any] struct {
-	Key K
+	Key   K
 	Value V
 }
 
 func fromLruEvicted[K comparable, V any](e *lru.Evicted[K, V]) *Evicted[K, V] {
+	if e == nil {
+		return nil
+	}
+
+	return &Evicted[K, V]{
+		e.Key,
+		e.Value,
+	}
+}
+
+func fromFifoEvicted[K comparable, V any](e *fifo.Evicted[K, V]) *Evicted[K, V] {
 	if e == nil {
 		return nil
 	}
@@ -51,11 +63,7 @@ func (L *TwoQueue[K, V]) Get(key K) *V {
 		return e
 	}
 
-	if e := L.recent.Peek(key); e != nil {
-		return e
-	}
-
-	return nil
+	return L.recent.Get(key)
 }
 
 // Set stores key/value pair in 2Q cache following 2Q Full Version promotion algorytm.
@@ -64,16 +72,16 @@ func (L *TwoQueue[K, V]) Set(key K, value V) *Evicted[K, V] {
 		return fromLruEvicted(L.frequent.Set(key, value))
 	}
 
-	if L.recentEvict.Peek(key) != nil {
+	if L.recentEvict.Get(key) != nil {
 		L.recentEvict.Remove(key)
 		return fromLruEvicted(L.frequent.Set(key, value))
 	}
 
-	if e := L.recent.Peek(key); e != nil {
-		return nil // TODO: L.recent.Set(key, value) (but without promotion)
-	} else if re := L.recent.Set(key, value); re != nil {
-		L.recentEvict.Set(re.Key, struct{}{})
-		return fromLruEvicted(re)
+	if e := L.recent.Get(key); e != nil {
+		return fromFifoEvicted(L.recent.Push(key, value))
+	} else if re := L.recent.Push(key, value); re != nil {
+		L.recentEvict.Push(re.Key, struct{}{})
+		return fromFifoEvicted(re)
 	}
 
 	return nil
@@ -90,7 +98,7 @@ func (L *TwoQueue[K, V]) Peek(key K) *V {
 		return e
 	}
 
-	return L.recent.Peek(key)
+	return L.recent.Get(key)
 }
 
 // Remove method removes entry associated with key and returns pointer to removed value (or nil if entry was not in cache).
@@ -120,8 +128,8 @@ func (L *TwoQueue[K, V]) Remove(key K) *V {
 // Cache will preallocate size count of internal structures to avoid allocation in process.
 func NewParams[K comparable, V any](Kin int, Kout int, size int) *TwoQueue[K, V] {
 	return &TwoQueue[K, V]{
-		recent:      lru.New[K, V](Kin),
-		recentEvict: lru.New[K, struct{}](Kout),
+		recent:      fifo.New[K, V](Kin),
+		recentEvict: fifo.New[K, struct{}](Kout),
 		frequent:    lru.New[K, V](size),
 	}
 }
@@ -129,8 +137,8 @@ func NewParams[K comparable, V any](Kin int, Kout int, size int) *TwoQueue[K, V]
 // New creates 2Q cache with predefined size splits. 25% of size goes to Kin, 50% to KOut and rest to Am size.
 func New[K comparable, V any](size int) *TwoQueue[K, V] {
 	return NewParams[K, V](
-		int(Default2QRecentRatio * float64(size)),
-		int(Default2QGhostEntries * float64(size)),
-		int((1 - Default2QRecentRatio) * float64(size)),
+		int(Default2QRecentRatio*float64(size)),
+		int(Default2QGhostEntries*float64(size)),
+		int((1-Default2QRecentRatio)*float64(size)),
 	)
 }
