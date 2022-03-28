@@ -77,9 +77,7 @@ func (L *TwoQueue[K, V]) Set(key K, value V) *Evicted[K, V] {
 		return fromLruEvicted(L.frequent.Set(key, value))
 	}
 
-	if e := L.recent.Get(key); e != nil {
-		return fromFifoEvicted(L.recent.Push(key, value))
-	} else if re := L.recent.Push(key, value); re != nil {
+	if re := L.recent.Push(key, value); re != nil {
 		L.recentEvict.Push(re.Key, struct{}{})
 		return fromFifoEvicted(re)
 	}
