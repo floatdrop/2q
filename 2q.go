@@ -70,7 +70,7 @@ func (L *TwoQueue[K, V]) Set(key K, value V) *Evicted[K, V] {
 	}
 
 	if e := L.recent.Peek(key); e != nil {
-		return nil
+		return nil // TODO: L.recent.Set(key, value) (but without promotion)
 	} else if re := L.recent.Set(key, value); re != nil {
 		L.recentEvict.Set(re.Key, struct{}{})
 		return fromLruEvicted(re)
