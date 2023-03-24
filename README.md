@@ -7,7 +7,7 @@
 
 Thread safe GoLang [2Q](http://www.vldb.org/conf/1994/P439.PDF) cache.
 
-## Example
+## Examples
 
 ```go
 import (
