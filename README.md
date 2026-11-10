@@ -4,6 +4,9 @@
 ![Coverage](https://img.shields.io/badge/Coverage-88.9%25-brightgreen)
 [![Go Report Card](https://goreportcard.com/badge/github.com/floatdrop/2q)](https://goreportcard.com/report/github.com/floatdrop/2q)
 
+> [!CAUTION]
+> This repository is archived. Eviction implementations moved to [evict](https://github.com/floatdrop/evict) library.
+
 Thread safe GoLang [2Q](http://www.vldb.org/conf/1994/P439.PDF) cache.
 
 ## Example
